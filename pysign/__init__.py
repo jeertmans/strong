@@ -1,0 +1,1 @@
+from pysign.decorators import assert_correct_typing
