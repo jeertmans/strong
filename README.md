@@ -1,5 +1,5 @@
 <div align="center">
-<img src="img/logo.png"/>
+<img src="img/logo.png" width=300 />
 <a href="http://www.freepik.com">Designed by Freepik</a>
 </div>
 
