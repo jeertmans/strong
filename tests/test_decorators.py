@@ -24,7 +24,6 @@ def f_mul_int_missing_all(a, b):
 
 
 class TestDecorators(TestCase):
-
     def test_assert_correct_typing(self):
 
         f = assert_correct_typing(f_mul_int_typed)
@@ -42,8 +41,8 @@ class TestDecorators(TestCase):
         f_a(a, b)
 
         # 2. Check with incorrect typing
-        assert_msg = 'AssertionError should have been raised'
-        no_assert_msg = 'Not error should have been raised'
+        assert_msg = "AssertionError should have been raised"
+        no_assert_msg = "Not error should have been raised"
 
         a, b = 1, 0.5
 
