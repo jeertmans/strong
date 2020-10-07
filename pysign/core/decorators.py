@@ -9,8 +9,8 @@ from pysign.utils.output import (
     raise_assertion_error,
     raise_warning,
 )
-from typing import Callable, Any, Optional, Tuple, Mapping
-from timeit import timeit
+from typing import Callable, Any, Optional, Mapping
+from timeit import timeit, Timer
 import functools
 
 
@@ -55,7 +55,7 @@ def warn_if_incorrect_typing(
     return check_correct_typing(func=func, join=join, output=raise_warning)
 
 
-def compute_overhead(
+def measure_overhead(
     func: Optional[Callable] = None,
     decorator: Optional[Callable] = None,
     dec_kwargs: Optional[Mapping[str, Any]] = None,
@@ -67,35 +67,43 @@ def compute_overhead(
         decorator = func
         func = None
 
-    def _compute_overhead(func):
+    def _measure_overhead(func):
 
         wrapped = decorator(func=func, **dec_kwargs)
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            t_std = timeit(lambda: func(*args, **kwargs), number=1000)
-            t_wrp = timeit(lambda: wrapped(*args, **kwargs), number=1000)
+            n, t_std = Timer(lambda: func(*args, **kwargs)).autorange()
+            t_wrp = timeit(lambda: wrapped(*args, **kwargs), number=n)
             return t_wrp / t_std
 
         return wrapper
 
     if func is not None:
-        return _compute_overhead(func)
+        return _measure_overhead(func)
     else:
-        return _compute_overhead
+        return _measure_overhead
 
 
 if __name__ == "__main__":
 
     import numpy as np
+    from typing import Union
 
-    @compute_overhead(assert_correct_typing)
+    @measure_overhead(assert_correct_typing)
     def f(a: int, b: int) -> np.ndarray:
         return np.random.rand(a, a) + b
 
     @assert_correct_typing
-    def g(a: int, b: Tuple[int, float]) -> int:
+    def g(a: int, b: int) -> int:
         return a + b
 
-    g(1, 1)
+
+    def h(a: int, b: int) -> int:
+        return a + b
+
+    h2 = assert_correct_typing(h)
+
+    h2(2.0, 1)
+    g(1, 1.0)
     print(f(100, 100))
