@@ -31,7 +31,9 @@ def check_correct_typing(
 
             result = func(*args, **kwargs)
 
-            output_if_ret_incorrect_typing(out_type, result, output=output, context=context)
+            output_if_ret_incorrect_typing(
+                out_type, result, output=output, context=context
+            )
 
             return result
 
@@ -98,11 +100,10 @@ if __name__ == "__main__":
     def g(a: int, b: int) -> int:
         return a + b
 
-
     def h(a: int, b: int) -> int:
         return a + b
 
-    g(1, '2')
+    g(1, "2")
 
     h2 = assert_correct_typing(h)
 
