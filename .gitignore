@@ -8,3 +8,5 @@ dist/
 build/
 
 pysign_jeertmans.egg-info/
+
+pysign.egg-info/

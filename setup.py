@@ -4,7 +4,7 @@ with open('README.md', 'r') as f:
     long_description = f.read()
     
 setuptools.setup(
-    name='pysign-jeertmans',
+    name='pysign',
     version='0.1',
     author='Jérome Eertmans',
     author_email='jeertmans@icloud.com',
