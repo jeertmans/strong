@@ -1,4 +1,4 @@
-from pysign.signature import *
+from pysign.core.signature import *
 from typing import List, Tuple, Optional, Mapping, Union, Set
 
 from unittest import TestCase

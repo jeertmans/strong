@@ -10,3 +10,7 @@ build/
 pysign_jeertmans.egg-info/
 
 pysign.egg-info/
+
+pysign/utils/__pycache__/
+
+pysign/core/__pycache__/

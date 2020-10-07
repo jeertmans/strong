@@ -1,7 +1,7 @@
-pysign
-======
+core
+====
 
 .. toctree::
    :maxdepth: 4
 
-   pysign
+   core

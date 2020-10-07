@@ -1,6 +1,6 @@
 import inspect
 from typing import Callable, Tuple, Union, Any, Mapping, List, Dict, Set
-from pysign.output import DEFAULT_OUTPUT, raise_assertion_error
+from pysign.utils.output import DEFAULT_OUTPUT, raise_assertion_error
 
 
 def get_function_parameters(

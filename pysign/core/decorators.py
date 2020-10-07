@@ -1,10 +1,10 @@
-from pysign.signature import (
+from pysign.core.signature import (
     get_function_parameters,
     get_function_context,
     output_if_args_incorrect_typing,
     output_if_ret_incorrect_typing,
 )
-from pysign.output import (
+from pysign.utils.output import (
     DEFAULT_OUTPUT,
     raise_assertion_error,
     raise_warning,
