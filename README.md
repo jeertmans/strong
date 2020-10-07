@@ -1,3 +1,8 @@
+<div align="center">
+<img src="img/logo.png"/>
+<a href="http://www.freepik.com">Designed by Freepik</a>
+</div>
+
 # PySign - from type-hint to real typing
 PySign is a small package written in pure Python and aiming to provide easy-to-use tools to validate the type of parameters and output of a given function.
 
