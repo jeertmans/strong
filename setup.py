@@ -5,7 +5,7 @@ with open('README.md', 'r') as f:
     
 setuptools.setup(
     name='pysign',
-    version='0.1',
+    version='0.2',
     author='Jérome Eertmans',
     author_email='jeertmans@icloud.com',
     description='checking function signature',
