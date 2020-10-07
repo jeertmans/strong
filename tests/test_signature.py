@@ -1,5 +1,5 @@
 from pysign.core.signature import *
-from typing import List, Tuple, Optional, Mapping, Union, Set
+from typing import List, Tuple, Optional, Mapping, Union, Set, Any
 
 from unittest import TestCase
 
@@ -19,6 +19,7 @@ class TestDecorators(TestCase):
 
         args = [
             (4, int),
+            (4, Any),
             (SubInt(), int),
             (Foo(), Foo),
             (4, Union[int, float]),
