@@ -8,7 +8,7 @@ setuptools.setup(
     version='0.2',
     author='Jérome Eertmans',
     author_email='jeertmans@icloud.com',
-    description='checking function signature',
+    description='Static type checker function signatures',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/jeertmans/pysign',
@@ -19,5 +19,5 @@ setuptools.setup(
         'Operating System :: OS Independent'
     ],
     license='MIT',
-    python_requires='>=3'
+    python_requires='>=3.5'
 )
