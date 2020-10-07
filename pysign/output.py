@@ -10,8 +10,8 @@ def raise_assertion_error(msg):
     raise AssertionError(msg)
 
 
-def raise_attribute_error(msg):
-    raise AttributeError(msg)
+def raise_type_error(msg):
+    raise TypeError(msg)
 
 
 def raise_stdout(msg):
