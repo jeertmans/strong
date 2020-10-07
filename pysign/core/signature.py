@@ -103,7 +103,7 @@ def get_ret_wrong_typing_error_message(annotation: type, ret: Any) -> str:
 
 def get_message_with_context(msg: str, context: str) -> str:
     if len(context) == 0:
-        return
+        return msg
     else:
         msg = "\t" + "\n\t".join(msg.splitlines())
         return f"{context}\n{msg}"
