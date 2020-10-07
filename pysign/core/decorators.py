@@ -92,7 +92,7 @@ if __name__ == "__main__":
 
     @measure_overhead(assert_correct_typing)
     def f(a: int, b: int) -> np.ndarray:
-        return np.random.rand(a, a) + b
+        return np.random.rand(a, b)
 
     @assert_correct_typing
     def g(a: int, b: int) -> int:
@@ -102,8 +102,8 @@ if __name__ == "__main__":
     def h(a: int, b: int) -> int:
         return a + b
 
+    g(1, '2')
+
     h2 = assert_correct_typing(h)
 
-    h2(2.0, 1)
-    g(1, 1.0)
     print(f(100, 100))
