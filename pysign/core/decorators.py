@@ -31,7 +31,7 @@ def check_correct_typing(
 
             result = func(*args, **kwargs)
 
-            output_if_ret_incorrect_typing(out_type, result, output=output)
+            output_if_ret_incorrect_typing(out_type, result, output=output, context=context)
 
             return result
 
