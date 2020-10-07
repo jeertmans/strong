@@ -1,11 +1,13 @@
 import inspect
-from typing import Callable, Tuple, List, Any
-from pysign.output import *
+from typing import Callable, Tuple, List, Any, Mapping
+from pysign.output import DEFAULT_OUTPUT, raise_assertion_error
 
 
-def get_function_parameters(f: Callable) -> Tuple[List[inspect.Parameter], type]:
+def get_function_parameters(
+    f: Callable,
+) -> Tuple[Mapping[str, inspect.Parameter], type]:
     sign = inspect.signature(f)
-    return list(sign.parameters.values()), sign.return_annotation
+    return sign.parameters, sign.return_annotation
 
 
 def check_arg_typing(param: inspect.Parameter, arg: Any) -> Tuple[bool, str]:
@@ -18,7 +20,7 @@ def check_arg_typing(param: inspect.Parameter, arg: Any) -> Tuple[bool, str]:
     if not ret_val:
         ret_msg = get_arg_wrong_typing_error_message(param, arg)
     else:
-        ret_msg = ''
+        ret_msg = ""
 
     return ret_val, ret_msg
 
@@ -32,46 +34,55 @@ def check_ret_typing(annotation: type, ret: Any) -> Tuple[bool, str]:
     if not ret_val:
         ret_msg = get_ret_wrong_typing_error_message(annotation, ret)
     else:
-        ret_msg = ''
+        ret_msg = ""
 
     return ret_val, ret_msg
 
 
 def get_arg_wrong_typing_error_message(param: inspect.Parameter, arg: Any) -> str:
-    return f'Argument `{param.name}` does not match typing: {repr(arg)} is not an instance of {param.annotation}'
+    return f"Argument `{param.name}` does not match typing: {repr(arg)} is not an instance of {param.annotation}"
 
 
 def get_ret_wrong_typing_error_message(annotation: type, ret: Any) -> str:
-    return f'Return value does not match typing: {repr(ret)} is not an instance of {annotation}'
+    return f"Return value does not match typing: {repr(ret)} is not an instance of {annotation}"
 
 
-def check_args_typing(params: List[inspect.Parameter], args: Any):
-    return [
-        check_arg_typing(param, arg) for param, arg in zip(params, args)
-    ]
+def check_args_typing(params: Mapping[str, inspect.Parameter], *args: Any, **kwargs):
+    checks = []
+
+    for param, arg in zip(params.values(), args):
+        checks.append(check_arg_typing(param, arg))
+
+    for key, arg in kwargs.items():
+        checks.append(check_args_typing(params[key], arg))
+
+    return checks
 
 
-def output_if_arg_incorrect_typing(param: inspect.Parameter,
-                                   arg: Any,
-                                   output: Callable = raise_stderr) -> None:
+def output_if_arg_incorrect_typing(
+    param: inspect.Parameter, arg: Any, output: Callable = DEFAULT_OUTPUT
+) -> None:
     ret_val, ret_msg = check_arg_typing(param, arg)
     if not ret_val:
         output(ret_msg)
 
 
-def output_if_ret_incorrect_typing(annotation: type,
-                                   ret: Any,
-                                   output: Callable = raise_stderr) -> None:
+def output_if_ret_incorrect_typing(
+    annotation: type, ret: Any, output: Callable = DEFAULT_OUTPUT
+) -> None:
     ret_val, ret_msg = check_ret_typing(annotation, ret)
     if not ret_val:
         output(ret_msg)
 
 
-def output_if_args_incorrect_typing(params: List[inspect.Parameter],
-                                    args: List[Any],
-                                    join: bool = True,
-                                    output: Callable = raise_stderr) -> None:
-    checks = check_args_typing(params, args)
+def output_if_args_incorrect_typing(
+    params: List[inspect.Parameter],
+    *args: Any,
+    join: bool = True,
+    output: Callable = DEFAULT_OUTPUT,
+    **kwargs: Any,
+) -> None:
+    checks = check_args_typing(params, *args, **kwargs)
 
     if join:
         success = True
@@ -84,7 +95,7 @@ def output_if_args_incorrect_typing(params: List[inspect.Parameter],
                 failed.append(ret_msg)
 
         if not success:
-            output('\n'.join(failed))
+            output("\n".join(failed))
 
     else:
         for ret_val, ret_msg in checks:
@@ -100,5 +111,12 @@ def assert_ret_correct_typing(annotation: type, ret: Any) -> None:
     return output_if_ret_incorrect_typing(annotation, ret, output=raise_assertion_error)
 
 
-def assert_args_correct_typing(params: List[inspect.Parameter], args: List[Any], join: bool = True) -> None:
-    return output_if_args_incorrect_typing(params, args, join=join, output=raise_assertion_error)
+def assert_args_correct_typing(
+    params: Mapping[str, inspect.Parameter],
+    *args: Any,
+    join: bool = True,
+    **kwargs: Any,
+) -> None:
+    return output_if_args_incorrect_typing(
+        params, *args, join=join, output=raise_assertion_error, **kwargs
+    )

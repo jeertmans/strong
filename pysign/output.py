@@ -20,3 +20,6 @@ def raise_stdout(msg):
 
 def raise_stderr(msg):
     print(msg, file=sys.stderr)
+
+
+DEFAULT_OUTPUT = raise_stderr
