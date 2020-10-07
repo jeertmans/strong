@@ -58,7 +58,10 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
         else:
             return False
     else:
-        return isinstance(obj, annotation)
+        if annotation == Any:
+            return True
+        else:
+            return isinstance(obj, annotation)
 
 
 def check_arg_typing(param: inspect.Parameter, arg: Any) -> Tuple[bool, str]:
