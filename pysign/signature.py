@@ -54,7 +54,7 @@ def check_args_typing(params: Mapping[str, inspect.Parameter], *args: Any, **kwa
         checks.append(check_arg_typing(param, arg))
 
     for key, arg in kwargs.items():
-        checks.append(check_args_typing(params[key], arg))
+        checks.append(check_arg_typing(params[key], arg))
 
     return checks
 
@@ -76,7 +76,7 @@ def output_if_ret_incorrect_typing(
 
 
 def output_if_args_incorrect_typing(
-    params: List[inspect.Parameter],
+    params: Mapping[str, inspect.Parameter],
     *args: Any,
     join: bool = True,
     output: Callable = DEFAULT_OUTPUT,
