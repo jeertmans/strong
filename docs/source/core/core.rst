@@ -4,22 +4,11 @@ core package
 Submodules
 ----------
 
-core.decorators module
-----------------------
+.. toctree::
+   :maxdepth: 4
 
-.. automodule:: core.decorators
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-core.signature module
----------------------
-
-.. automodule:: core.signature
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
+   core.decorators
+   core.signature
 
 Module contents
 ---------------

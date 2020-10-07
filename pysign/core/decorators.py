@@ -48,6 +48,24 @@ def check_correct_typing(
 def assert_correct_typing(
     func: Optional[Callable] = None, join: bool = True
 ) -> Callable:
+    """
+    Wraps a function while asserting that the arguments and output are correctly typed.
+    
+    :param func: the function
+    :param join: if True, will join all errors and raise them at once
+    :return: the function wrapped
+    
+    :Example:
+    
+    >>> from pysign.core.decorators import assert_correct_typing
+    >>> @assert_correct_typing
+    >>> def f(a: int, b: int) -> int:
+    >>>     return a + b
+    >>> x = f(1, 2)    # O.K.
+    >>> y = f(1, '2')  # K.O.
+    AssertionError: Function f defined in "<function_file>", line 3
+        Argument `b` does not match typing: '2' is not an instance of <class 'int'>
+    """
     return check_correct_typing(func=func, join=join, output=raise_assertion_error)
 
 
@@ -62,6 +80,24 @@ def measure_overhead(
     decorator: Optional[Callable] = None,
     dec_kwargs: Optional[Mapping[str, Any]] = None,
 ) -> Callable:
+    """
+    Returns the overhead time ratio between a function call with @decorator and without.
+
+    :param func: the function
+    :param decorator: the decorator which will be measured
+    :param dec_kwargs: optional keyword-arguments to be passed to the decorator
+    :return: a function computing the overhead time ratio, i.e. time (with dec.) / time (without dec.)
+
+    :Example:
+
+    >>> from pysign.core.decorators import assert_correct_typing, measure_overhead
+    >>> import numpy as np
+    >>> @measure_overhead(assert_correct_typing)
+    >>> def g(a: int, b: int) -> np.ndarray:
+    >>>    return np.random.rand(a, b)
+    >>> g(100, 100)
+    1.0687804670719938  # Ratio between time taken with @assert_correct_typing and without
+    """
     if dec_kwargs is None:
         dec_kwargs = dict()
 

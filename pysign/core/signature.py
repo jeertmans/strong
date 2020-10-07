@@ -14,11 +14,10 @@ def get_function_parameters(
 
     :Example:
 
-    def f(a: int, b: int) -> int:
-        return a + b
-
-    get_function_parameters(f)
-    >>>
+    >>> def f(a: int, b: int) -> int:
+    >>>     return a + b
+    >>> get_function_parameters(f)
+    (mappingproxy({'a': <Parameter "a:int">, 'b': <Parameter "b:int">}), int)
     """
     sign = inspect.signature(f)
     return sign.parameters, sign.return_annotation

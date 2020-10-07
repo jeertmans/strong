@@ -4,14 +4,10 @@ utils package
 Submodules
 ----------
 
-utils.output module
--------------------
+.. toctree::
+   :maxdepth: 4
 
-.. automodule:: utils.output
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
+   utils.output
 
 Module contents
 ---------------
