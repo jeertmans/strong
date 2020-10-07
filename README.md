@@ -1,5 +1,5 @@
 <p align="center">
-<img src="img/logo.png" width=300></img>
+<img src="https://github.com/jeertmans/pysign/blob/main/img/logo.png" width=300></img>
 </p>
 <p align="center">
 <a href="http://www.freepik.com">Designed by Freepik</a>
