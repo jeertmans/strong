@@ -14,3 +14,5 @@ pysign.egg-info/
 strong/utils/__pycache__/
 
 strong/core/__pycache__/
+
+strong.egg-info/
