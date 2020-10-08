@@ -13,6 +13,10 @@ Simply use:
 
 `pip install strong`
 
+## Documentation:
+
+The documentation is hosted [here](https://strong.readthedocs.io/en/latest/).
+
 ## Example:
 
 Let's say you have a function taking two inputs, `a` and `b`, and returning one output. In Python, you can use type-hint in order to give clue about the type the parameters should have. Nonetheless, Python will not block inputs with the wrong type.
