@@ -20,24 +20,24 @@ Let's say you have a function taking two inputs, `a` and `b`, and returning one 
 This package is here to provide tools to make the task of checking input parameters type easy.
 
 ```python
-[1] from strong.core.decorators import assert_correct_typing
-[2] 
-[3] @assert_correct_typing
-[4] def f(a: int, b: int) -> int:
-[5]     return a + b
-[6]  
-[7] x = f(1, 2)  # O.K.
-[8]
-[9] y = f(1, '2')  # K.O.
+from strong.core.decorators import assert_correct_typing
+
+@assert_correct_typing
+def f(a: int, b: int) -> int:
+    return a + b
+
+x = f(1, 2)  # O.K.
+
+y = f(1, '2')  # K.O.
 >>> AssertionError: Function f defined in "<function_file>", line 3
 >>>     Argument `b` does not match typing: '2' is not an instance of <class 'int'>
-[10] from strong.core.decorators import measure_overhead
-[11] import numpy as np
-[12]
-[13] @measure_overhead(assert_correct_typing)
-[14] def g(a: int, b: int) -> np.ndarray:
-[15]    return np.random.rand(a, b)
-[16]
-[17] g(100, 100)
+from strong.core.decorators import measure_overhead
+import numpy as np
+
+@measure_overhead(assert_correct_typing)
+def g(a: int, b: int) -> np.ndarray:
+    return np.random.rand(a, b)
+    
+g(100, 100)
 >>> 1.0687804670719938  # Ratio between time taken with @assert_correct_typing and without
 ```
