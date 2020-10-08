@@ -11,6 +11,7 @@ def get_function_parameters(
 
     :param f: the function
     :return: the parameters and the output type
+    :raises: ValueError: if the function is a builtin function or method
 
     :Example:
 
@@ -24,7 +25,14 @@ def get_function_parameters(
 
 
 def get_function_context(f: Callable) -> str:
-    return f'Function {f.__name__} defined in "{inspect.getfile(f)}", line {inspect.getsourcelines(f)[1]}'
+    name = f.__name__
+
+    file = inspect.getsourcefile(f)
+    try:
+        lineno = inspect.getsourcelines(f)[1]
+    except OSError:
+        lineno = "<SourceCodeCannotBeRetrieved>"
+    return f'Function {name} defined in "{file}", line {lineno}'
 
 
 def check_obj_typing(annotation: type, obj: Any) -> bool:
