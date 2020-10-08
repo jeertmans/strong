@@ -51,13 +51,15 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
                 if len(obj) != nargs:
                     return False
                 else:
-                    return all(check_obj_typing(t, o) for t, o in zip(args, obj))
+                    return all(
+                        check_obj_typing(t, o) for t, o in zip(args, obj)
+                    )
             elif origin == List:
                 return all(check_obj_typing(args[0], o) for o in obj)
             elif origin == Mapping or origin == Dict:
-                return all(check_obj_typing(args[0], o) for o in obj.keys()) and all(
-                    check_obj_typing(args[1], o) for o in obj.values()
-                )
+                return all(
+                    check_obj_typing(args[0], o) for o in obj.keys()
+                ) and all(check_obj_typing(args[1], o) for o in obj.values())
             elif origin == Set:
                 return all(check_obj_typing(args[0], o) for o in obj)
             else:
@@ -100,12 +102,20 @@ def check_ret_typing(annotation: type, ret: Any) -> Tuple[bool, str]:
     return ret_val, ret_msg
 
 
-def get_arg_wrong_typing_error_message(param: inspect.Parameter, arg: Any) -> str:
-    return f"Argument `{param.name}` does not match typing: {repr(arg)} is not an instance of {param.annotation}"
+def get_arg_wrong_typing_error_message(
+    param: inspect.Parameter, arg: Any
+) -> str:
+    return (
+        f"Argument `{param.name}` does not match typing:"
+        f"{repr(arg)} is not an instance of {param.annotation}"
+    )
 
 
 def get_ret_wrong_typing_error_message(annotation: type, ret: Any) -> str:
-    return f"Return value does not match typing: {repr(ret)} is not an instance of {annotation}"
+    return (
+        f"Return value does not match typing:"
+        f"{repr(ret)} is not an instance of {annotation}"
+    )
 
 
 def get_message_with_context(msg: str, context: str) -> str:
@@ -116,7 +126,9 @@ def get_message_with_context(msg: str, context: str) -> str:
         return f"{context}\n{msg}"
 
 
-def check_args_typing(params: Mapping[str, inspect.Parameter], *args: Any, **kwargs):
+def check_args_typing(
+    params: Mapping[str, inspect.Parameter], *args: Any, **kwargs
+):
     checks = []
 
     for param, arg in zip(params.values(), args):
@@ -125,7 +137,9 @@ def check_args_typing(params: Mapping[str, inspect.Parameter], *args: Any, **kwa
     for key, arg in kwargs.items():
         try:
             checks.append(check_arg_typing(params[key], arg))
-        except KeyError:  # If invalid keyword argument, will let the error be raised by Python
+        except KeyError:
+            # If invalid keyword argument,
+            # will let the error be raised by Python
             pass
 
     return checks
@@ -144,7 +158,10 @@ def output_if_arg_incorrect_typing(
 
 
 def output_if_ret_incorrect_typing(
-    annotation: type, ret: Any, output: Callable = DEFAULT_OUTPUT, context: str = ""
+    annotation: type,
+    ret: Any,
+    output: Callable = DEFAULT_OUTPUT,
+    context: str = "",
 ) -> None:
     ret_val, ret_msg = check_ret_typing(annotation, ret)
     if not ret_val:
@@ -191,7 +208,9 @@ def assert_arg_correct_typing(
     )
 
 
-def assert_ret_correct_typing(annotation: type, ret: Any, context: str = "") -> None:
+def assert_ret_correct_typing(
+    annotation: type, ret: Any, context: str = ""
+) -> None:
     return output_if_ret_incorrect_typing(
         annotation, ret, output=raise_assertion_error, context=context
     )
@@ -205,5 +224,10 @@ def assert_args_correct_typing(
     context: str = "",
 ) -> None:
     return output_if_args_incorrect_typing(
-        params, args, kwargs, join=join, output=raise_assertion_error, context=context
+        params,
+        args,
+        kwargs,
+        join=join,
+        output=raise_assertion_error,
+        context=context,
     )
