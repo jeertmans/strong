@@ -6,6 +6,7 @@
 
 .. image:: https://raw.githubusercontent.com/jeertmans/strong/main/img/logo.png
    :align: center
+   :height: 300
 
 
 Welcome to Strong's documentation!

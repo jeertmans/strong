@@ -50,13 +50,13 @@ def assert_correct_typing(
 ) -> Callable:
     """
     Wraps a function while asserting that the arguments and output are correctly typed.
-    
+
     :param func: the function
     :param join: if True, will join all errors and raise them at once
     :return: the function wrapped
-    
+
     :Example:
-    
+
     >>> from strong.core.decorators import assert_correct_typing
     >>> @assert_correct_typing
     >>> def f(a: int, b: int) -> int:
