@@ -7,6 +7,11 @@ def raise_warning(msg: str) -> None:
     Raises a warning with given message.
 
     :param msg: the message
+
+    :Example:
+
+    >>> raise_warning("Hello")
+    Warning: Hello
     """
     warnings.warn(msg, Warning)
 

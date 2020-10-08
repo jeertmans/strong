@@ -1,8 +1,8 @@
-utils package
+Utils package
 =============
 
-Submodules
-----------
+Utils
+-----
 
 .. toctree::
    :maxdepth: 1
