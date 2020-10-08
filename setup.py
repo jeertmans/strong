@@ -5,13 +5,13 @@ with open('README.md', 'r') as f:
     
 setuptools.setup(
     name='strong',
-    version='0.4',
+    version='0.1',
     author='Jérome Eertmans',
     author_email='jeertmans@icloud.com',
     description='Dynamic type checker for function signatures',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/jeertmans/pysign',
+    url='https://github.com/jeertmans/strong',
     packages=setuptools.find_packages(),
     classifiers=[
         'Programming Language :: Python :: 3',
