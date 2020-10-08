@@ -1,4 +1,6 @@
-from strong.core.signature import *
+from strong.core.signature import (
+    check_obj_typing
+)
 from typing import List, Tuple, Optional, Mapping, Union, Set, Any
 
 from unittest import TestCase

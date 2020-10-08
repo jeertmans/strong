@@ -1,4 +1,6 @@
-from strong.core.decorators import *
+from strong.core.decorators import (
+    assert_correct_typing
+)
 
 from unittest import TestCase
 
