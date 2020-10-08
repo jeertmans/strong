@@ -1,7 +1,7 @@
 
 .idea/
 
-pysign/__pycache__/
+strong/__pycache__/
 
 dist/
 
@@ -11,6 +11,6 @@ pysign_jeertmans.egg-info/
 
 pysign.egg-info/
 
-pysign/utils/__pycache__/
+strong/utils/__pycache__/
 
-pysign/core/__pycache__/
+strong/core/__pycache__/

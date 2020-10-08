@@ -1,10 +1,10 @@
-from pysign.core.signature import (
+from strong.core.signature import (
     get_function_parameters,
     get_function_context,
     output_if_args_incorrect_typing,
     output_if_ret_incorrect_typing,
 )
-from pysign.utils.output import (
+from strong.utils.output import (
     DEFAULT_OUTPUT,
     raise_assertion_error,
     raise_warning,
@@ -57,7 +57,7 @@ def assert_correct_typing(
     
     :Example:
     
-    >>> from pysign.core.decorators import assert_correct_typing
+    >>> from strong.core.decorators import assert_correct_typing
     >>> @assert_correct_typing
     >>> def f(a: int, b: int) -> int:
     >>>     return a + b
@@ -90,7 +90,7 @@ def measure_overhead(
 
     :Example:
 
-    >>> from pysign.core.decorators import assert_correct_typing, measure_overhead
+    >>> from strong.core.decorators import assert_correct_typing, measure_overhead
     >>> import numpy as np
     >>> @measure_overhead(assert_correct_typing)
     >>> def g(a: int, b: int) -> np.ndarray:

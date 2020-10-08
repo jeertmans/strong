@@ -13,16 +13,16 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../..'))
-sys.path.insert(0, os.path.abspath('../../pysign/'))
-sys.path.insert(0, os.path.abspath('../../pysign/core'))
-sys.path.insert(0, os.path.abspath('../../pysign/utils'))
+sys.path.insert(0, os.path.abspath('../../strong/'))
+sys.path.insert(0, os.path.abspath('../../strong/core'))
+sys.path.insert(0, os.path.abspath('../../strong/utils'))
 
 print(sys.path)
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'pysign'
+project = 'strong'
 copyright = '2020, Jérome Eertmans'
 author = 'Jérome Eertmans'
 

@@ -5,8 +5,14 @@
 <a href="http://www.freepik.com">Designed by Freepik</a>
 </p>
 
-# PySign - from type-hint to real typing
-PySign is a small package written in pure Python and aiming to provide easy-to-use tools to validate the type of parameters and output of a given function.
+# Strong - Dynamic type checker for function signatures
+Strong embraces the builtin `typing` package by providing dynamic type checking for function signatures.
+
+## Install:
+
+Simply use:
+
+`pip install strong`
 
 ## Example:
 
@@ -15,7 +21,7 @@ Let's say you have a function taking two inputs, `a` and `b`, and returning one 
 This package is here to provide tools to make the task of checking input parameters type easy.
 
 ```python
-[1] from pysign.core.decorators import assert_correct_typing
+[1] from strong.core.decorators import assert_correct_typing
 [2] 
 [3] @assert_correct_typing
 [4] def f(a: int, b: int) -> int:
@@ -26,7 +32,7 @@ This package is here to provide tools to make the task of checking input paramet
 [9] y = f(1, '2')  # K.O.
 >>> AssertionError: Function f defined in "<function_file>", line 3
 >>>     Argument `b` does not match typing: '2' is not an instance of <class 'int'>
-[10] from pysign.core.decorators import measure_overhead
+[10] from strong.core.decorators import measure_overhead
 [11] import numpy as np
 [12]
 [13] @measure_overhead(assert_correct_typing)

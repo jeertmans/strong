@@ -1,4 +1,4 @@
-from pysign.core.decorators import *
+from strong.core.decorators import *
 
 from unittest import TestCase
 

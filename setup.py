@@ -4,11 +4,11 @@ with open('README.md', 'r') as f:
     long_description = f.read()
     
 setuptools.setup(
-    name='pysign',
+    name='strong',
     version='0.4',
     author='Jérome Eertmans',
     author_email='jeertmans@icloud.com',
-    description='Static type checker function signatures',
+    description='Dynamic type checker for function signatures',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/jeertmans/pysign',

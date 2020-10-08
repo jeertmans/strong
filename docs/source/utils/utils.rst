@@ -5,14 +5,6 @@ Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
    utils.output
-
-Module contents
----------------
-
-.. automodule:: utils
-   :members:
-   :undoc-members:
-   :show-inheritance:

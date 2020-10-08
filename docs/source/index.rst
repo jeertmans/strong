@@ -3,11 +3,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pysign's documentation!
+Welcome to Pysign's documentation!
 ==================================
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
    :caption: Contents:
 
    core/modules
