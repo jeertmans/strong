@@ -2,6 +2,8 @@
 <img src="https://raw.githubusercontent.com/jeertmans/strong/main/img/logo.png" width=300></img>
 </p>
 
+![](https://img.shields.io/readthedocs/strong)
+
 # Strong - Dynamic type checker for function signatures
 Strong embraces the builtin `typing` package by providing dynamic type checking for function signatures.
 
