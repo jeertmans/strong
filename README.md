@@ -1,8 +1,5 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/jeertmans/pysign/main/img/logo.png" width=300></img>
-</p>
-<p align="center">
-<a href="http://www.freepik.com">Designed by Freepik</a>
+<img src="https://raw.githubusercontent.com/jeertmans/strong/main/img/logo.png" width=300></img>
 </p>
 
 # Strong - Dynamic type checker for function signatures
