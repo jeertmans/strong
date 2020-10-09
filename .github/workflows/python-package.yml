@@ -29,10 +29,12 @@ jobs:
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         ls
-    - name: Lint with flake8
+    - name: Lint package with flake8
+      run: |
+        flake8 strong --count --exit-zero --statistics --show-source
+    - name: Lint tests with flake8
       run: |
         flake8 tests --count --exit-zero --statistics --show-source
-        flake8 strong --count --exit-zero --statistics --show-source
     - name: Test with pytest
       run: |
-        pytest
+        python -m pytest tests

@@ -1,6 +1,9 @@
 import inspect
 from typing import Callable, Tuple, Union, Any, Mapping, List, Dict, Set
 from strong.utils.output import DEFAULT_OUTPUT, raise_assertion_error
+from collections.abc import (
+    Mapping as abcMapping
+)
 
 
 def get_function_parameters(
@@ -70,6 +73,8 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
     """
     origin = getattr(annotation, "__origin__", None)
 
+    print('ICI', obj, origin, annotation)
+
     if origin is not None:
         args = getattr(annotation, "__args__", None)
         nargs = len(args)
@@ -79,20 +84,21 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
             return any(check_obj_typing(t, obj) for t in args)
 
         elif isinstance(obj, origin):
-            if origin == Tuple:
+            if origin == Tuple or origin == tuple:
                 if len(obj) != nargs:
                     return False
                 else:
                     return all(
                         check_obj_typing(t, o) for t, o in zip(args, obj)
                     )
-            elif origin == List:
+            elif origin == List or origin == list:
                 return all(check_obj_typing(args[0], o) for o in obj)
-            elif origin == Mapping or origin == Dict:
+            elif origin == Mapping or origin == abcMapping or origin == Dict \
+                    or origin == dict:
                 return all(
                     check_obj_typing(args[0], o) for o in obj.keys()
                 ) and all(check_obj_typing(args[1], o) for o in obj.values())
-            elif origin == Set:
+            elif origin == Set or origin == set:
                 return all(check_obj_typing(args[0], o) for o in obj)
             else:
                 raise NotImplementedError(
