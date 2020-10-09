@@ -95,14 +95,16 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
             elif origin == Set:
                 return all(check_obj_typing(args[0], o) for o in obj)
             else:
-                raise NotImplementedError(f"Type {annotation} is currently "
-                                          f"not "
-                                          f"supported. Please post an issue "
-                                          f"on "
-                                          f"the github so that we can quickly "
-                                          f"fix it: "
-                                          f"https://github.com/jeertmans"
-                                          f"/strong/issues")
+                raise NotImplementedError(
+                    f"Type {annotation} is currently "
+                    f"not "
+                    f"supported. Please post an issue "
+                    f"on "
+                    f"the github so that we can quickly "
+                    f"fix it: "
+                    f"https://github.com/jeertmans"
+                    f"/strong/issues"
+                )
         else:
             return False
     else:
