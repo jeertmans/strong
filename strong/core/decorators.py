@@ -73,9 +73,7 @@ def assert_correct_typing(
         Argument `b` does not match typing: '2' is not an instance of
         <class 'int'>
     """
-    return check_correct_typing(
-        func=func, join=join, output=raise_assertion_error
-    )
+    return check_correct_typing(func=func, join=join, output=raise_assertion_error)
 
 
 def warn_if_incorrect_typing(

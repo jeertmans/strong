@@ -19,5 +19,9 @@ setuptools.setup(
         'Operating System :: OS Independent'
     ],
     license='MIT',
-    python_requires='>=3.5'
+    python_requires='>=3.5',
+    entry_points="""
+        [console_scripts]
+        strong=strong.scripts.strong:main
+    """
 )

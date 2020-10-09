@@ -18,3 +18,5 @@ strong/core/__pycache__/
 strong.egg-info/
 
 tests/__pycache__/
+
+*.pyc
