@@ -41,7 +41,7 @@ def check_function(f: Callable) -> None:
 
 
 def check_module(filename: str) -> None:
-    module_name = os.path.splitext(os.path.basename(filename))[0]
+    module_name = filename.slit('/')[-1][:-3]
     spec = importlib.util.spec_from_file_location(module_name, filename)
     module = importlib.util.module_from_spec(spec)
 
