@@ -1,6 +1,4 @@
-from strong.core.decorators import (
-    assert_correct_typing
-)
+from strong.core.decorators import assert_correct_typing
 from functions import (
     f_mul_int_typed,
     f_mul_int_missing_one,
@@ -8,9 +6,7 @@ from functions import (
     f_mul_int_missing_all,
     f_mul_int_typed_kwd,
 )
-from objects import (
-    SubInt
-)
+from objects import SubInt
 
 from unittest import TestCase
 

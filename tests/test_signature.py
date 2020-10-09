@@ -8,21 +8,10 @@ from functions import (
     f_mul_int_missing_two,
     f_mul_int_missing_all,
     f_mul_int_typed_kwd,
-    f_mul_int_typed_from_string
+    f_mul_int_typed_from_string,
 )
-from objects import (
-    Foo,
-    SubInt
-)
-from typing import (
-    List,
-    Tuple,
-    Optional,
-    Mapping,
-    Union,
-    Set,
-    Any
-)
+from objects import Foo, SubInt
+from typing import List, Tuple, Optional, Mapping, Union, Set, Any
 import inspect
 
 from unittest import TestCase
@@ -34,7 +23,6 @@ def ok_get_function_signature(f):
 
 
 class TestDecorators(TestCase):
-
     def test_get_function_signature(self):
 
         my_func = get_function_parameters
@@ -48,7 +36,7 @@ class TestDecorators(TestCase):
             f_mul_int_missing_two,
             f_mul_int_missing_all,
             f_mul_int_typed_kwd,
-            f_mul_int_typed_from_string
+            f_mul_int_typed_from_string,
         ]
 
         for i, arg in enumerate(args):

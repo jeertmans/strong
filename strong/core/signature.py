@@ -1,9 +1,7 @@
 import inspect
 from typing import Callable, Tuple, Union, Any, Mapping, List, Dict, Set
 from strong.utils.output import DEFAULT_OUTPUT, raise_assertion_error
-from collections.abc import (
-    Mapping as abcMapping
-)
+from collections.abc import Mapping as abcMapping
 
 
 def get_function_parameters(
@@ -52,7 +50,7 @@ def get_function_context(f: Callable) -> str:
         lineno = inspect.getsourcelines(f)[1]
     except OSError:
         lineno = "<SourceCodeCannotBeRetrieved>"
-    return f'Function {name} defined in "{file}", line {lineno}'
+    return f"""Function {name} defined in "{file}", line {lineno}"""
 
 
 def check_obj_typing(annotation: type, obj: Any) -> bool:
@@ -73,7 +71,7 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
     """
     origin = getattr(annotation, "__origin__", None)
 
-    print('ICI', obj, origin, annotation)
+    print("ICI", obj, origin, annotation)
 
     if origin is not None:
         args = getattr(annotation, "__args__", None)
@@ -93,8 +91,12 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
                     )
             elif origin == List or origin == list:
                 return all(check_obj_typing(args[0], o) for o in obj)
-            elif origin == Mapping or origin == abcMapping or origin == Dict \
-                    or origin == dict:
+            elif (
+                origin == Mapping
+                or origin == abcMapping
+                or origin == Dict
+                or origin == dict
+            ):
                 return all(
                     check_obj_typing(args[0], o) for o in obj.keys()
                 ) and all(check_obj_typing(args[1], o) for o in obj.values())
