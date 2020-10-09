@@ -1,18 +1,50 @@
-from strong.core.signature import *
+from strong.core.signature import (
+    get_function_parameters,
+    check_obj_typing,
+)
+from functions import (
+    f_mul_int_typed,
+    f_mul_int_missing_one,
+    f_mul_int_missing_two,
+    f_mul_int_missing_all,
+    f_mul_int_typed_kwd,
+    f_mul_int_typed_from_string,
+)
+from objects import Foo, SubInt
 from typing import List, Tuple, Optional, Mapping, Union, Set, Any
+import inspect
 
 from unittest import TestCase
 
 
-class SubInt(int):
-    pass
-
-
-class Foo:
-    pass
+def ok_get_function_signature(f):
+    sign = inspect.signature(f)
+    return sign.parameters, sign.return_annotation
 
 
 class TestDecorators(TestCase):
+    def test_get_function_signature(self):
+
+        my_func = get_function_parameters
+        ok_func = ok_get_function_signature
+
+        # 1. Check that output is consistent
+
+        args = [
+            f_mul_int_typed,
+            f_mul_int_missing_one,
+            f_mul_int_missing_two,
+            f_mul_int_missing_all,
+            f_mul_int_typed_kwd,
+            f_mul_int_typed_from_string,
+        ]
+
+        for i, arg in enumerate(args):
+            with self.subTest(i=i):
+                got = my_func(arg)
+                expected = ok_func(arg)
+                self.assertEqual(got, expected)
+
     def test_check_obj_typing(self):
 
         # 1. Check for correct typing

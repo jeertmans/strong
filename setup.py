@@ -2,7 +2,7 @@ import setuptools
 
 with open('README.md', 'r') as f:
     long_description = f.read()
-    
+
 setuptools.setup(
     name='strong',
     version='0.1',
@@ -19,5 +19,9 @@ setuptools.setup(
         'Operating System :: OS Independent'
     ],
     license='MIT',
-    python_requires='>=3.5'
+    python_requires='>=3.5',
+    entry_points="""
+        [console_scripts]
+        strong=strong.scripts.strong:main
+    """
 )

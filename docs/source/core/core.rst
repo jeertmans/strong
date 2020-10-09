@@ -1,8 +1,8 @@
-core package
+Core package
 ============
 
-Submodules
-----------
+Core modules
+------------
 
 .. toctree::
    :maxdepth: 4

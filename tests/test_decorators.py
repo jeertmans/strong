@@ -1,34 +1,14 @@
-from strong.core.decorators import *
+from strong.core.decorators import assert_correct_typing
+from functions import (
+    f_mul_int_typed,
+    f_mul_int_missing_one,
+    f_mul_int_missing_two,
+    f_mul_int_missing_all,
+    f_mul_int_typed_kwd,
+)
+from objects import SubInt
 
 from unittest import TestCase
-
-
-def f_mul(a, b):
-    return a * b * 0.5
-
-
-def f_mul_int_typed(a: int, b: int) -> float:
-    return f_mul(a, b)
-
-
-def f_mul_int_missing_one(a: int, b) -> float:
-    return f_mul(a, b)
-
-
-def f_mul_int_missing_two(a, b) -> float:
-    return f_mul(a, b)
-
-
-def f_mul_int_missing_all(a, b):
-    return f_mul(a, b)
-
-
-def f_mul_int_typed_kwd(a: int, b: int = 0) -> float:
-    return f_mul(a, b)
-
-
-class SubInt(int):
-    pass
 
 
 class TestDecorators(TestCase):

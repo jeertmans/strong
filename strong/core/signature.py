@@ -1,6 +1,7 @@
 import inspect
 from typing import Callable, Tuple, Union, Any, Mapping, List, Dict, Set
 from strong.utils.output import DEFAULT_OUTPUT, raise_assertion_error
+from collections.abc import Mapping as abcMapping
 
 
 def get_function_parameters(
@@ -11,6 +12,7 @@ def get_function_parameters(
 
     :param f: the function
     :return: the parameters and the output type
+    :raises: ValueError: if the function is a builtin function or method
 
     :Example:
 
@@ -24,10 +26,50 @@ def get_function_parameters(
 
 
 def get_function_context(f: Callable) -> str:
-    return f'Function {f.__name__} defined in "{inspect.getfile(f)}", line {inspect.getsourcelines(f)[1]}'
+    """
+    Returns the function's context, containing:
+    * its name
+    * the location of its code
+    * the first line of its code (if exists)
+
+    :param f: the function
+    :return: the context
+    :raises: TypeError: if the function is a builtin function or method
+
+    :Example:
+
+    >>> def f(a: int, b: int) -> int:
+    >>>     return a + b
+    >>> get_function_context(f)
+    "<stdin>:1:f"
+    """
+    name = f.__qualname__
+
+    file = inspect.getsourcefile(f)
+    try:
+        lineno = inspect.getsourcelines(f)[1]
+    except OSError:
+        lineno = "<SourceCodeCannotBeRetrieved>"
+
+    return "%s:%d:%s" % (file, lineno, name)
 
 
 def check_obj_typing(annotation: type, obj: Any) -> bool:
+    """
+    Returns True if the object matches a given type.
+    An object matches a type if it can be considered to be an instance of
+    given type.
+
+    :param annotation: the type annotation
+    :param obj: the object
+    :return: True if object matches given type
+
+    :Example:
+
+    >>> from typing import Union
+    >>> check_obj_typing(Union[int, float], 1)
+    True
+    """
     origin = getattr(annotation, "__origin__", None)
 
     if origin is not None:
@@ -39,21 +81,37 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
             return any(check_obj_typing(t, obj) for t in args)
 
         elif isinstance(obj, origin):
-            if origin == Tuple:
+            if origin == Tuple or origin == tuple:
                 if len(obj) != nargs:
                     return False
                 else:
-                    return all(check_obj_typing(t, o) for t, o in zip(args, obj))
-            elif origin == List:
+                    return all(
+                        check_obj_typing(t, o) for t, o in zip(args, obj)
+                    )
+            elif origin == List or origin == list:
                 return all(check_obj_typing(args[0], o) for o in obj)
-            elif origin == Mapping or origin == Dict:
-                return all(check_obj_typing(args[0], o) for o in obj.keys()) and all(
-                    check_obj_typing(args[1], o) for o in obj.values()
-                )
-            elif origin == Set:
+            elif (
+                origin == Mapping
+                or origin == abcMapping
+                or origin == Dict
+                or origin == dict
+            ):
+                return all(
+                    check_obj_typing(args[0], o) for o in obj.keys()
+                ) and all(check_obj_typing(args[1], o) for o in obj.values())
+            elif origin == Set or origin == set:
                 return all(check_obj_typing(args[0], o) for o in obj)
             else:
-                return False  # Not supported ?
+                raise NotImplementedError(
+                    "Type %s is currently "
+                    "not "
+                    "supported. Please post an issue "
+                    "on "
+                    "the github so that we can quickly "
+                    "fix it: "
+                    "https://github.com/jeertmans"
+                    "/strong/issues" % annotation
+                )
         else:
             return False
     else:
@@ -64,6 +122,15 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
 
 
 def check_arg_typing(param: inspect.Parameter, arg: Any) -> Tuple[bool, str]:
+    """
+    Returns True if input argument matches given parameter type.
+    Otherwise return False and an error message.
+    See :func:`check_obj_typing` for more information.
+
+    :param param: the parameter
+    :param arg: the input argument
+    :return: True if argument matches parameter type
+    """
     annotation = param.annotation
     if annotation == inspect.Parameter.empty:
         ret_val = True
@@ -79,6 +146,15 @@ def check_arg_typing(param: inspect.Parameter, arg: Any) -> Tuple[bool, str]:
 
 
 def check_ret_typing(annotation: type, ret: Any) -> Tuple[bool, str]:
+    """
+    Returns True if return value matches given parameter type.
+    Otherwise return False and an error message.
+    See :func:`check_obj_typing` for more information.
+
+    :param annotation: the type
+    :param ret: the return value
+    :return: True if argument matches parameter type
+    """
     if annotation == inspect.Parameter.empty:
         ret_val = True
     else:
@@ -92,23 +168,75 @@ def check_ret_typing(annotation: type, ret: Any) -> Tuple[bool, str]:
     return ret_val, ret_msg
 
 
-def get_arg_wrong_typing_error_message(param: inspect.Parameter, arg: Any) -> str:
-    return f"Argument `{param.name}` does not match typing: {repr(arg)} is not an instance of {param.annotation}"
+def get_arg_wrong_typing_error_message(
+    param: inspect.Parameter, arg: Any
+) -> str:
+    """
+    Builds a message for a wrong argument typing error.
+
+    :param param: the parameter
+    :param arg: the input argument
+    :return: the message
+    """
+    return (
+        "Argument `%s` does not match typing:"
+        "%s is not an instance of %s"
+        % (
+            param.name,
+            repr(arg),
+            param.annotation,
+        )
+    )
 
 
 def get_ret_wrong_typing_error_message(annotation: type, ret: Any) -> str:
-    return f"Return value does not match typing: {repr(ret)} is not an instance of {annotation}"
+    """
+    Builds a message for a wrong return value typing error.
+
+    :param annotation: the type
+    :param ret: the return value
+    :return: the message
+    """
+    return (
+        "Return value does not match typing:"
+        "%s is not an instance of %s"
+        % (
+            repr(ret),
+            annotation,
+        )
+    )
 
 
 def get_message_with_context(msg: str, context: str) -> str:
+    """
+    Concatenates an error message with a context. If context is empty
+    string, will only return the error message.
+
+    :param msg: the message
+    :param context: the context of the message
+    :return: the message with context
+    """
     if len(context) == 0:
         return msg
     else:
         msg = "\t" + "\n\t".join(msg.splitlines())
-        return f"{context}\n{msg}"
+        return "%s\n%s" % (context, msg)
 
 
-def check_args_typing(params: Mapping[str, inspect.Parameter], *args: Any, **kwargs):
+def check_args_typing(
+    params: Mapping[str, inspect.Parameter], *args: Any, **kwargs: Any
+) -> List[Tuple[bool, str]]:
+    """
+    Returns a list of (bool, message) pairs for each input argument.
+    See :func:`check_arg_typing` for more information.
+    If a keyword argument is invalid, it will be skipped.
+    Same applies if to many arguments are given.
+
+    :param params: the parameters
+    :param args: the input positional arguments
+    :param kwargs: the input keyword arguments
+    :return: a list of (bool, message) pairs
+    """
     checks = []
 
     for param, arg in zip(params.values(), args):
@@ -117,7 +245,9 @@ def check_args_typing(params: Mapping[str, inspect.Parameter], *args: Any, **kwa
     for key, arg in kwargs.items():
         try:
             checks.append(check_arg_typing(params[key], arg))
-        except KeyError:  # If invalid keyword argument, will let the error be raised by Python
+        except KeyError:
+            # If invalid keyword argument,
+            # will let the error be raised by Python
             pass
 
     return checks
@@ -129,6 +259,16 @@ def output_if_arg_incorrect_typing(
     output: Callable = DEFAULT_OUTPUT,
     context: str = "",
 ) -> None:
+    """
+    Outputs an error message if input argument doesn't matches given parameter
+    type.
+    See :func:`check_arg_typing` for more information.
+
+    :param param: the parameter
+    :param arg: the input argument
+    :param output: the desired output (see utils.output module)
+    :param context: the context of the message
+    """
     ret_val, ret_msg = check_arg_typing(param, arg)
     if not ret_val:
         ret_msg = get_message_with_context(ret_msg, context)
@@ -136,8 +276,21 @@ def output_if_arg_incorrect_typing(
 
 
 def output_if_ret_incorrect_typing(
-    annotation: type, ret: Any, output: Callable = DEFAULT_OUTPUT, context: str = ""
+    annotation: type,
+    ret: Any,
+    output: Callable = DEFAULT_OUTPUT,
+    context: str = "",
 ) -> None:
+    """
+    Outputs an error message if return value doesn't matches given parameter
+    type.
+    See :func:`check_ret_typing` for more information.
+
+    :param annotation: the type
+    :param ret: the return value
+    :param output: the desired output (see utils.output module)
+    :param context: the context of the message
+    """
     ret_val, ret_msg = check_ret_typing(annotation, ret)
     if not ret_val:
         ret_msg = get_message_with_context(ret_msg, context)
@@ -152,6 +305,19 @@ def output_if_args_incorrect_typing(
     output: Callable = DEFAULT_OUTPUT,
     context: str = "",
 ) -> None:
+    """
+    Outputs an error message if any input argument doesn't matches given
+    parameter
+    type.
+    See :func:`check_args_typing` for more information.
+
+    :param params: the parameter
+    :param args: the input positional arguments
+    :param kwargs:  the input keyword arguments
+    :param join: if True, will join all the errors in one
+    :param output: the desired output (see utils.output module)
+    :param context: the context of the message
+    """
     checks = check_args_typing(params, *args, **kwargs)
 
     if join:
@@ -178,12 +344,30 @@ def output_if_args_incorrect_typing(
 def assert_arg_correct_typing(
     param: inspect.Parameter, arg: Any, context: str = ""
 ) -> None:
+    """
+    Applies :func:`output_if_arg_incorrect_typing` with assertion error as
+    output.
+
+    :param param: the parameter
+    :param arg: the input argument
+    :param context: the context of the message
+    """
     return output_if_arg_incorrect_typing(
         param, arg, output=raise_assertion_error, context=context
     )
 
 
-def assert_ret_correct_typing(annotation: type, ret: Any, context: str = "") -> None:
+def assert_ret_correct_typing(
+    annotation: type, ret: Any, context: str = ""
+) -> None:
+    """
+    Applies :func:`output_if_ret_incorrect_typing` with assertion error as
+    output.
+
+    :param annotation: the type
+    :param ret: the return value
+    :param context: the context of the message
+    """
     return output_if_ret_incorrect_typing(
         annotation, ret, output=raise_assertion_error, context=context
     )
@@ -196,6 +380,21 @@ def assert_args_correct_typing(
     join: bool = True,
     context: str = "",
 ) -> None:
+    """
+    Applies :func:`output_if_args_incorrect_typing` with assertion error as
+    output.
+
+    :param params: the parameter
+    :param args: the input positional arguments
+    :param kwargs:  the input keyword arguments
+    :param join: if True, will join all the errors in one
+    :param context: the context of the message
+    """
     return output_if_args_incorrect_typing(
-        params, args, kwargs, join=join, output=raise_assertion_error, context=context
+        params,
+        args,
+        kwargs,
+        join=join,
+        output=raise_assertion_error,
+        context=context,
     )

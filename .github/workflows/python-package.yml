@@ -5,7 +5,7 @@ name: Python package
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, v0.2 ]
   pull_request:
     branches: [ main ]
 
@@ -16,7 +16,6 @@ jobs:
     strategy:
       matrix:
         python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -27,13 +26,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest
+        python setup.py install
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
+        ls
+    - name: Lint package with flake8
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        flake8 strong --count --exit-zero --statistics --show-source
+    - name: Lint tests with flake8
+      run: |
+        flake8 tests --count --exit-zero --statistics --show-source
     - name: Test with pytest
       run: |
         python -m pytest tests
