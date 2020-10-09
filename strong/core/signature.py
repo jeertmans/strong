@@ -50,7 +50,7 @@ def get_function_context(f: Callable) -> str:
         lineno = inspect.getsourcelines(f)[1]
     except OSError:
         lineno = "<SourceCodeCannotBeRetrieved>"
-    return f"Function {name} defined in `{file}`, line {lineno}"
+    return "Function %s defined in `%s`, line %d" % (name, file, lineno)
 
 
 def check_obj_typing(annotation: type, obj: Any) -> bool:
@@ -70,8 +70,6 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
     True
     """
     origin = getattr(annotation, "__origin__", None)
-
-    print("ICI", obj, origin, annotation)
 
     if origin is not None:
         args = getattr(annotation, "__args__", None)
@@ -104,14 +102,14 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
                 return all(check_obj_typing(args[0], o) for o in obj)
             else:
                 raise NotImplementedError(
-                    f"Type {annotation} is currently "
-                    f"not "
-                    f"supported. Please post an issue "
-                    f"on "
-                    f"the github so that we can quickly "
-                    f"fix it: "
-                    f"https://github.com/jeertmans"
-                    f"/strong/issues"
+                    "Type %s is currently "
+                    "not "
+                    "supported. Please post an issue "
+                    "on "
+                    "the github so that we can quickly "
+                    "fix it: "
+                    "https://github.com/jeertmans"
+                    "/strong/issues" % annotation
                 )
         else:
             return False
@@ -163,15 +161,16 @@ def get_arg_wrong_typing_error_message(
     param: inspect.Parameter, arg: Any
 ) -> str:
     return (
-        f"Argument `{param.name}` does not match typing:"
-        f"{repr(arg)} is not an instance of {param.annotation}"
+        "Argument `%s` does not match typing:"
+        "%s is not an instance of %s"
+        % (param.name, repr(arg), param.annotation)
     )
 
 
 def get_ret_wrong_typing_error_message(annotation: type, ret: Any) -> str:
     return (
-        f"Return value does not match typing:"
-        f"{repr(ret)} is not an instance of {annotation}"
+        "Return value does not match typing:"
+        "%s is not an instance of %s" % (repr(ret), annotation)
     )
 
 
@@ -180,7 +179,7 @@ def get_message_with_context(msg: str, context: str) -> str:
         return msg
     else:
         msg = "\t" + "\n\t".join(msg.splitlines())
-        return f"{context}\n{msg}"
+        return "%s\n%s" % (context, msg)
 
 
 def check_args_typing(
