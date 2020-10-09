@@ -28,6 +28,7 @@ def check_correct_typing(
     :param output: the desired output (see utils.output module)
     :return: the function wrapped
     """
+
     def _check_correct_typing(func):
         args_mapping, out_type = get_function_parameters(func)
         context = get_function_context(func)
@@ -81,7 +82,9 @@ def assert_correct_typing(
         Argument `b` does not match typing: '2' is not an instance of
         <class 'int'>
     """
-    return check_correct_typing(func=func, join=join, output=raise_assertion_error)
+    return check_correct_typing(
+        func=func, join=join, output=raise_assertion_error
+    )
 
 
 def warn_if_incorrect_typing(

@@ -85,7 +85,9 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
                 if len(obj) != nargs:
                     return False
                 else:
-                    return all(check_obj_typing(t, o) for t, o in zip(args, obj))
+                    return all(
+                        check_obj_typing(t, o) for t, o in zip(args, obj)
+                    )
             elif origin == List or origin == list:
                 return all(check_obj_typing(args[0], o) for o in obj)
             elif (
@@ -94,9 +96,9 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
                 or origin == Dict
                 or origin == dict
             ):
-                return all(check_obj_typing(args[0], o) for o in obj.keys()) and all(
-                    check_obj_typing(args[1], o) for o in obj.values()
-                )
+                return all(
+                    check_obj_typing(args[0], o) for o in obj.keys()
+                ) and all(check_obj_typing(args[1], o) for o in obj.values())
             elif origin == Set or origin == set:
                 return all(check_obj_typing(args[0], o) for o in obj)
             else:
@@ -166,7 +168,9 @@ def check_ret_typing(annotation: type, ret: Any) -> Tuple[bool, str]:
     return ret_val, ret_msg
 
 
-def get_arg_wrong_typing_error_message(param: inspect.Parameter, arg: Any) -> str:
+def get_arg_wrong_typing_error_message(
+    param: inspect.Parameter, arg: Any
+) -> str:
     """
     Builds a message for a wrong argument typing error.
 
@@ -174,10 +178,14 @@ def get_arg_wrong_typing_error_message(param: inspect.Parameter, arg: Any) -> st
     :param arg: the input argument
     :return: the message
     """
-    return "Argument `%s` does not match typing:" "%s is not an instance of %s" % (
-        param.name,
-        repr(arg),
-        param.annotation,
+    return (
+        "Argument `%s` does not match typing:"
+        "%s is not an instance of %s"
+        % (
+            param.name,
+            repr(arg),
+            param.annotation,
+        )
     )
 
 
@@ -189,9 +197,13 @@ def get_ret_wrong_typing_error_message(annotation: type, ret: Any) -> str:
     :param ret: the return value
     :return: the message
     """
-    return "Return value does not match typing:" "%s is not an instance of %s" % (
-        repr(ret),
-        annotation,
+    return (
+        "Return value does not match typing:"
+        "%s is not an instance of %s"
+        % (
+            repr(ret),
+            annotation,
+        )
     )
 
 
@@ -345,7 +357,9 @@ def assert_arg_correct_typing(
     )
 
 
-def assert_ret_correct_typing(annotation: type, ret: Any, context: str = "") -> None:
+def assert_ret_correct_typing(
+    annotation: type, ret: Any, context: str = ""
+) -> None:
     """
     Applies :func:`output_if_ret_incorrect_typing` with assertion error as
     output.

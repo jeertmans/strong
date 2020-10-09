@@ -7,10 +7,7 @@ import importlib.util
 import sys
 from typing import Callable
 
-IGNORE_ARGS = [
-    'self',
-    'cls'
-]
+IGNORE_ARGS = ["self", "cls"]
 
 parser = argparse.ArgumentParser(
     description="Verifies that every function in every module is typed."
@@ -31,10 +28,14 @@ def check_function(f: Callable) -> None:
     header = get_function_context(f)
 
     for parameter_name, parameter_type in parameters.items():
-        if parameter_type.annotation == inspect.Parameter.empty and \
-                parameter_name not in IGNORE_ARGS:
-            print("%s: parameter `%s` is missing type-hint" % (header,
-                                                               parameter_name))
+        if (
+            parameter_type.annotation == inspect.Parameter.empty
+            and parameter_name not in IGNORE_ARGS
+        ):
+            print(
+                "%s: parameter `%s` is missing type-hint"
+                % (header, parameter_name)
+            )
     if out_type == inspect.Parameter.empty:
         print("%s: return value is missing type-hint" % header)
 
@@ -46,7 +47,7 @@ def check_module(filename: str) -> None:
 
     try:
         spec.loader.exec_module(module)
-    except:
+    except Exception:
         pass  # Some files like setup.py cannot be loaded...
 
     members = inspect.getmembers(module)
@@ -60,8 +61,9 @@ def check_module(filename: str) -> None:
         for member_name, member_type in members:
             member = getattr(obj, member_name, None)
 
-            if inspect.isfunction(member_type) and module_path == \
-                    inspect.getfile(member_type):
+            if inspect.isfunction(
+                member_type
+            ) and module_path == inspect.getfile(member_type):
                 check_function(member)
             elif inspect.isclass(member_type):
                 _check_members(member, inspect.getmembers(member), depth - 1)
