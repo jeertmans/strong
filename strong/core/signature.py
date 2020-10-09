@@ -50,7 +50,7 @@ def get_function_context(f: Callable) -> str:
         lineno = inspect.getsourcelines(f)[1]
     except OSError:
         lineno = "<SourceCodeCannotBeRetrieved>"
-    return f"""Function {name} defined in "{file}", line {lineno}"""
+    return f"Function {name} defined in `{file}`, line {lineno}"
 
 
 def check_obj_typing(annotation: type, obj: Any) -> bool:
