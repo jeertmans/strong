@@ -25,6 +25,23 @@ def get_function_parameters(
 
 
 def get_function_context(f: Callable) -> str:
+    """
+    Returns the function's context, containing:
+    * its name
+    * the location of its code
+    * the first line of its code (if exists)
+
+    :param f: the function
+    :return: the context
+    :raises: TypeError: if the function is a builtin function or method
+
+    :Example:
+
+    >>> def f(a: int, b: int) -> int:
+    >>>     return a + b
+    >>> get_function_context(f)
+    'Function f defined in "<path>", line <lineno>'
+    """
     name = f.__name__
 
     file = inspect.getsourcefile(f)
@@ -36,6 +53,21 @@ def get_function_context(f: Callable) -> str:
 
 
 def check_obj_typing(annotation: type, obj: Any) -> bool:
+    """
+    Returns True if the object matches a given type.
+    An object matches a type if it can be considered to be an instance of
+    given type.
+
+    :param annotation: the type annotation
+    :param obj: the object
+    :return: True if object matches given type
+
+    :Example:
+
+    >>> from typing import Union
+    >>> check_obj_typing(Union[int, float], 1)
+    True
+    """
     origin = getattr(annotation, "__origin__", None)
 
     if origin is not None:
@@ -63,7 +95,14 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
             elif origin == Set:
                 return all(check_obj_typing(args[0], o) for o in obj)
             else:
-                return False  # Not supported ?
+                raise NotImplementedError(f"Type {annotation} is currently "
+                                          f"not "
+                                          f"supported. Please post an issue "
+                                          f"on "
+                                          f"the github so that we can quickly "
+                                          f"fix it: "
+                                          f"https://github.com/jeertmans"
+                                          f"/strong/issues")
         else:
             return False
     else:
@@ -74,6 +113,14 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
 
 
 def check_arg_typing(param: inspect.Parameter, arg: Any) -> Tuple[bool, str]:
+    """
+    Returns True if input argument matches given parameter type.
+    See :func:`check_obj_typing` for more information.
+
+    :param param: the parameter
+    :param arg: the input argument
+    :return: True if argument matches parameter type
+    """
     annotation = param.annotation
     if annotation == inspect.Parameter.empty:
         ret_val = True
@@ -128,7 +175,7 @@ def get_message_with_context(msg: str, context: str) -> str:
 
 def check_args_typing(
     params: Mapping[str, inspect.Parameter], *args: Any, **kwargs
-):
+) -> List[Tuple[bool, str]]:
     checks = []
 
     for param, arg in zip(params.values(), args):
