@@ -55,12 +55,24 @@ coding guidelines as the one used by default with the Flake8 tool:
    flake8 strong
    flake8 tests
 
+And Strong provide additional checks on typing:
+
+.. code::
+
+   strong strong
+
 Code reformatting is done using Black tool:
 
 .. code::
 
    black strong -l 79
    black tests -l 79
+
+Lastly, make sure to run the tests:
+
+.. code::
+
+   pytest tests
 
 Indices and tables
 ==================
