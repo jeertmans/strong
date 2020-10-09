@@ -41,7 +41,7 @@ def check_function(f: Callable) -> None:
 
 
 def check_module(filename: str) -> None:
-    module_name = filename.slit('/')[-1][:-3]
+    module_name = inspect.getmodulename(filename)
     spec = importlib.util.spec_from_file_location(module_name, filename)
     module = importlib.util.module_from_spec(spec)
 
@@ -83,6 +83,6 @@ def main() -> None:
         if args.input != ".":
             sys.path.insert(0, os.path.abspath(args.input))
         for path in Path(args.input).rglob("*.py"):
-            check_module(path)
+            check_module(str(path))
     else:
         raise TypeError("`%s` is not a directory nor a file" % args.input)
