@@ -7,6 +7,11 @@ import importlib.util
 import sys
 from typing import Callable
 
+IGNORE_ARGS = [
+    'self',
+    'cls'
+]
+
 parser = argparse.ArgumentParser(
     description="Verifies that every function in every module is typed."
 )
@@ -26,7 +31,8 @@ def check_function(f: Callable) -> None:
     header = get_function_context(f)
 
     for parameter_name, parameter_type in parameters.items():
-        if parameter_type.annotation == inspect.Parameter.empty:
+        if parameter_type.annotation == inspect.Parameter.empty and \
+                parameter_name not in IGNORE_ARGS:
             print("%s: parameter `%s` is missing type-hint" % (header,
                                                                parameter_name))
     if out_type == inspect.Parameter.empty:
@@ -37,7 +43,12 @@ def check_module(filename: str) -> None:
     module_name = inspect.getmodulename(filename)
     spec = importlib.util.spec_from_file_location(module_name, filename)
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+
+    try:
+        spec.loader.exec_module(module)
+    except:
+        pass  # Some files like setup.py cannot be loaded...
+
     members = inspect.getmembers(module)
     module_path = inspect.getfile(module)
 
@@ -60,7 +71,6 @@ def check_module(filename: str) -> None:
 
 def main() -> None:
     args = parser.parse_args()
-
     if os.path.isfile(args.input):
         _, ext = os.path.splitext(args.input)
         if ext.lower() != ".py":
@@ -68,7 +78,8 @@ def main() -> None:
         else:
             check_module(args.input)
     elif os.path.isdir(args.input):
-        sys.path.insert(0, os.path.abspath(args.input))
+        if args.input != ".":
+            sys.path.insert(0, os.path.abspath(args.input))
         for path in Path(args.input).rglob("*.py"):
             check_module(path)
     else:

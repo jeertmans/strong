@@ -19,6 +19,15 @@ def check_correct_typing(
     join: bool = True,
     output: Callable = DEFAULT_OUTPUT,
 ) -> Callable:
+    """
+    Wraps a function while outpouting error(s) if the arguments and
+    output are incorrectly typed.
+
+    :param func: the function
+    :param join: if True, will join all errors and raise them at once
+    :param output: the desired output (see utils.output module)
+    :return: the function wrapped
+    """
     def _check_correct_typing(func):
         args_mapping, out_type = get_function_parameters(func)
         context = get_function_context(func)
@@ -54,8 +63,7 @@ def assert_correct_typing(
     func: Optional[Callable] = None, join: bool = True
 ) -> Callable:
     """
-    Wraps a function while asserting that the arguments and output are
-    correctly typed.
+    Applies :func:`check_correct_typing` with assertion error as output.
 
     :param func: the function
     :param join: if True, will join all errors and raise them at once
@@ -79,6 +87,13 @@ def assert_correct_typing(
 def warn_if_incorrect_typing(
     func: Optional[Callable] = None, join: bool = True
 ) -> Callable:
+    """
+    Applies :func:`check_correct_typing` with warning as output.
+
+    :param func: the function
+    :param join: if True, will join all errors and raise them at once
+    :return: the function wrapped
+    """
     return check_correct_typing(func=func, join=join, output=raise_warning)
 
 
