@@ -11,7 +11,7 @@ from functions import (
     f_mul_int_typed_from_string,
 )
 from objects import Foo, SubInt
-from typing import List, Tuple, Optional, Mapping, Union, Set, Any
+from typing import List, Tuple, Optional, Mapping, Union, Set, Any, Callable
 import inspect
 
 from unittest import TestCase
@@ -62,6 +62,7 @@ class TestDecorators(TestCase):
             ({"k": 1, 2: 3, "a": 33}, Mapping[Union[str, int], int]),
             ((1, "b", 3.0), Tuple[int, str, float]),
             ({1, 2, 3}, Set[int]),
+            (f_mul_int_typed, Callable[[int, int], float])
         ]
 
         for i, arg in enumerate(args):
@@ -83,6 +84,7 @@ class TestDecorators(TestCase):
             ({"k": 1, 2: 3, "a": 33}, Mapping[Union[str], int]),
             ((1, "b", 3.0), Tuple[int, str, float, str]),
             ({1, 2, 3}, Set[float]),
+            (f_mul_int_typed, Callable[[int, int], int])
         ]
 
         for i, arg in enumerate(args):
