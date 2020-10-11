@@ -1,7 +1,17 @@
 import inspect
-from typing import Callable, Tuple, Union, Any, Mapping, List, Dict, Set
+from typing import (
+    Callable,
+    Tuple,
+    Union,
+    Any,
+    Mapping,
+    List,
+    Dict,
+    Set,
+    Callable,
+)
 from strong.utils.output import DEFAULT_OUTPUT, raise_assertion_error
-from collections.abc import Mapping as abcMapping
+from collections.abc import Mapping as abcMapping, Callable as abcCallable
 
 
 def get_function_parameters(
@@ -101,6 +111,16 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
                 ) and all(check_obj_typing(args[1], o) for o in obj.values())
             elif origin == Set or origin == set:
                 return all(check_obj_typing(args[0], o) for o in obj)
+            elif origin == Callable or origin == abcCallable:
+                params, annotation = get_function_parameters(obj)
+                return (
+                    check_obj_typing(args[-1], annotation)
+                    and len(args[:-1]) == len(params)
+                    and all(
+                        check_obj_typing(arg, param.annotation)
+                        for arg, param in zip(args[:-1], params.values())
+                    )
+                )
             else:
                 raise NotImplementedError(
                     "Type %s is currently "
@@ -117,6 +137,8 @@ def check_obj_typing(annotation: type, obj: Any) -> bool:
     else:
         if annotation == Any:
             return True
+        elif type(obj) == type:
+            return issubclass(obj, annotation)
         else:
             return isinstance(obj, annotation)
 
