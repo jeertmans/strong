@@ -8,10 +8,26 @@ from typing import (
     List,
     Dict,
     Set,
+    Type,
+)
+from typing import (
+    Any,
     Callable,
+    Union,
+    Tuple,
+    Type,
+    get_type_hints,
+    get_origin,
+    get_args,
 )
 from strong.utils.output import DEFAULT_OUTPUT, raise_assertion_error
-from collections.abc import Mapping as abcMapping, Callable as abcCallable
+
+
+def annotation_to_type(annotation: type):
+    if annotation == inspect.Parameter.empty:
+        return Any
+    else:
+        return annotation
 
 
 def get_function_parameters(
@@ -33,6 +49,31 @@ def get_function_parameters(
     """
     sign = inspect.signature(f)
     return sign.parameters, sign.return_annotation
+
+
+def get_function_type_hints(
+    f: Callable,
+) -> Tuple[List[type], type]:
+    """
+    Returns function's type hints as parameters types and the output type.
+
+    :param f: the function
+    :return: the parameters types and the output type
+    :raises: ValueError: if the function is a builtin function or method
+
+    :Example:
+
+    >>> def f(a: int, b: int) -> int:
+    >>>     return a + b
+    >>> get_function_parameters(f)
+    ([int, int], int)
+    """
+    args, ret = get_function_parameters(f)
+    ret = annotation_to_type(ret)
+
+    args = [annotation_to_type(arg.annotation) for arg in args.values()]
+
+    return args, ret
 
 
 def get_function_context(f: Callable) -> str:
@@ -64,83 +105,92 @@ def get_function_context(f: Callable) -> str:
     return "%s:%d:%s" % (file, lineno, name)
 
 
-def check_obj_typing(annotation: type, obj: Any) -> bool:
+_TAGS_ = dict()
+_TAG_FUNCTION_SIGNATURE_ = {"x": Any, "args": type, "return": bool}
+
+
+def tag(*tags: type) -> Callable:
+    """
+    Wrapper that will add current function as reference to know is an object is
+    instance of tagged types.
+
+    :param tags:
+    :return:
+    """
+
+    def _tag_(func):
+        assert (
+                get_type_hints(func) == _TAG_FUNCTION_SIGNATURE_
+        ), f"Function {func} must exactly have this signature: {_TAG_FUNCTION_SIGNATURE_}"
+        for _tag in tags:
+            _TAGS_[_tag] = func
+
+        return func
+
+    return _tag_
+
+
+@tag(Any)
+def _any_(x: Any, *args: type) -> bool:
+    return True
+
+
+@tag(Callable)
+def _callable_(x: Any, *args: type) -> bool:
+    if not isinstance(x, Callable):
+        return False
+    if args:
+        args, ret = get_function_type_hints(x)
+        arg_tps = args[0]
+        ret_tp = args[1]
+        return (
+                len(args) == len(arg_tps)
+                and all(issubclass(arg_tp, arg) for arg, arg_tp in zip(args, arg_tps))
+                and issubclass(ret_tp, ret)
+        )
+    return True
+
+
+@tag(Tuple, tuple)
+def _tuple_(x: Any, *args: type) -> bool:
+    return isinstance(x, tuple) and len(x) == len(args)
+
+
+@tag(Type, type)
+def _type_(x: Any, *args: type) -> bool:
+    print("In here")
+    return check_obj_typing(x, args[0])
+
+
+@tag(Union)
+def _union_(x: Any, *args: type) -> bool:
+    return any(check_obj_typing(x, tp) for tp in args)
+
+
+def check_obj_typing(obj: Any, tp: type) -> bool:
     """
     Returns True if the object matches a given type.
     An object matches a type if it can be considered to be an instance of
     given type.
 
-    :param annotation: the type annotation
     :param obj: the object
+    :param tp: the type annotation
     :return: True if object matches given type
 
     :Example:
 
     >>> from typing import Union
-    >>> check_obj_typing(Union[int, float], 1)
+    >>> check_obj_typing(1, Union[int, float])
     True
     """
-    origin = getattr(annotation, "__origin__", None)
-
-    if origin is not None:
-        args = getattr(annotation, "__args__", None)
-        nargs = len(args)
-
-        if type(origin) == type(Union):
-
-            return any(check_obj_typing(t, obj) for t in args)
-
-        elif isinstance(obj, origin):
-            if origin == Tuple or origin == tuple:
-                if len(obj) != nargs:
-                    return False
-                else:
-                    return all(
-                        check_obj_typing(t, o) for t, o in zip(args, obj)
-                    )
-            elif origin == List or origin == list:
-                return all(check_obj_typing(args[0], o) for o in obj)
-            elif (
-                origin == Mapping
-                or origin == abcMapping
-                or origin == Dict
-                or origin == dict
-            ):
-                return all(
-                    check_obj_typing(args[0], o) for o in obj.keys()
-                ) and all(check_obj_typing(args[1], o) for o in obj.values())
-            elif origin == Set or origin == set:
-                return all(check_obj_typing(args[0], o) for o in obj)
-            elif origin == Callable or origin == abcCallable:
-                params, annotation = get_function_parameters(obj)
-                return (
-                    check_obj_typing(args[-1], annotation)
-                    and len(args[:-1]) == len(params)
-                    and all(
-                        check_obj_typing(arg, param.annotation)
-                        for arg, param in zip(args[:-1], params.values())
-                    )
-                )
-            else:
-                raise NotImplementedError(
-                    "Type %s is currently "
-                    "not "
-                    "supported. Please post an issue "
-                    "on "
-                    "the github so that we can quickly "
-                    "fix it: "
-                    "https://github.com/jeertmans"
-                    "/strong/issues" % annotation
-                )
-        else:
-            return False
+    origin, args = get_origin(tp), get_args(tp)
+    if origin is None:
+        origin = tp
+    if origin in _TAGS_:
+        return _TAGS_[origin](obj, *args)
     else:
-        if annotation == Any:
-            return True
-        elif type(obj) == type:
-            return issubclass(obj, annotation)
-        else:
-            return isinstance(obj, annotation)
+        print(obj, origin)
+        return isinstance(obj, origin)
 
 
 def check_arg_typing(param: inspect.Parameter, arg: Any) -> Tuple[bool, str]:
@@ -153,11 +203,8 @@ def check_arg_typing(param: inspect.Parameter, arg: Any) -> Tuple[bool, str]:
     :param arg: the input argument
     :return: True if argument matches parameter type
     """
-    annotation = param.annotation
-    if annotation == inspect.Parameter.empty:
-        ret_val = True
-    else:
-        ret_val = check_obj_typing(annotation, arg)
+    tp = annotation_to_type(param.annotation)
+    ret_val = check_obj_typing(arg, tp)
 
     if not ret_val:
         ret_msg = get_arg_wrong_typing_error_message(param, arg)
@@ -177,10 +224,8 @@ def check_ret_typing(annotation: type, ret: Any) -> Tuple[bool, str]:
     :param ret: the return value
     :return: True if argument matches parameter type
     """
-    if annotation == inspect.Parameter.empty:
-        ret_val = True
-    else:
-        ret_val = check_obj_typing(annotation, ret)
+    tp = annotation_to_type(annotation)
+    ret_val = check_obj_typing(ret, tp)
 
     if not ret_val:
         ret_msg = get_ret_wrong_typing_error_message(annotation, ret)
@@ -190,9 +235,7 @@ def check_ret_typing(annotation: type, ret: Any) -> Tuple[bool, str]:
     return ret_val, ret_msg
 
 
-def get_arg_wrong_typing_error_message(
-    param: inspect.Parameter, arg: Any
-) -> str:
+def get_arg_wrong_typing_error_message(param: inspect.Parameter, arg: Any) -> str:
     """
     Builds a message for a wrong argument typing error.
 
@@ -200,14 +243,10 @@ def get_arg_wrong_typing_error_message(
     :param arg: the input argument
     :return: the message
     """
-    return (
-        "Argument `%s` does not match typing:"
-        "%s is not an instance of %s"
-        % (
-            param.name,
-            repr(arg),
-            param.annotation,
-        )
+    return "Argument `%s` does not match typing:" "%s is not an instance of %s" % (
+        param.name,
+        repr(arg),
+        param.annotation,
     )
 
 
@@ -219,13 +258,9 @@ def get_ret_wrong_typing_error_message(annotation: type, ret: Any) -> str:
     :param ret: the return value
     :return: the message
     """
-    return (
-        "Return value does not match typing:"
-        "%s is not an instance of %s"
-        % (
-            repr(ret),
-            annotation,
-        )
+    return "Return value does not match typing:" "%s is not an instance of %s" % (
+        repr(ret),
+        annotation,
     )
 
 
@@ -379,9 +414,7 @@ def assert_arg_correct_typing(
     )
 
 
-def assert_ret_correct_typing(
-    annotation: type, ret: Any, context: str = ""
-) -> None:
+def assert_ret_correct_typing(annotation: type, ret: Any, context: str = "") -> None:
     """
     Applies :func:`output_if_ret_incorrect_typing` with assertion error as
     output.

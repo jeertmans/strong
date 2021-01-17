@@ -32,10 +32,7 @@ def check_function(f: Callable) -> None:
             parameter_type.annotation == inspect.Parameter.empty
             and parameter_name not in IGNORE_ARGS
         ):
-            print(
-                "%s: parameter `%s` is missing type-hint"
-                % (header, parameter_name)
-            )
+            print("%s: parameter `%s` is missing type-hint" % (header, parameter_name))
     if out_type == inspect.Parameter.empty:
         print("%s: return value is missing type-hint" % header)
 
@@ -61,9 +58,9 @@ def check_module(filename: str) -> None:
         for member_name, member_type in members:
             member = getattr(obj, member_name, None)
 
-            if inspect.isfunction(
+            if inspect.isfunction(member_type) and module_path == inspect.getfile(
                 member_type
-            ) and module_path == inspect.getfile(member_type):
+            ):
                 check_function(member)
             elif inspect.isclass(member_type):
                 _check_members(member, inspect.getmembers(member), depth - 1)

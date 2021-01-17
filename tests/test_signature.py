@@ -11,7 +11,7 @@ from functions import (
     f_mul_int_typed_from_string,
 )
 from objects import Foo, SubInt
-from typing import List, Tuple, Optional, Mapping, Union, Set, Any, Callable
+from typing import List, Tuple, Optional, Mapping, Union, Set, Any, Callable, Type
 import inspect
 
 from unittest import TestCase
@@ -62,12 +62,13 @@ class TestDecorators(TestCase):
             ({"k": 1, 2: 3, "a": 33}, Mapping[Union[str, int], int]),
             ((1, "b", 3.0), Tuple[int, str, float]),
             ({1, 2, 3}, Set[int]),
-            (f_mul_int_typed, Callable[[int, int], float])
+            (f_mul_int_typed, Callable[[int, int], float]),
+            (1, Type[int]),
         ]
 
         for i, arg in enumerate(args):
             with self.subTest(i=i):
-                got = check_obj_typing(arg[1], arg[0])
+                got = check_obj_typing(arg[0], arg[1])
                 self.assertTrue(got)
 
         # 2. Check for incorrect typing
@@ -79,15 +80,11 @@ class TestDecorators(TestCase):
             (4, Union[float]),
             (4, Optional[float]),
             ([4, 5], Set[int]),
-            ([4, None], List[int]),
-            ([SubInt(4), 4, 3.0, Foo()], List[Tuple[int, float, Foo]]),
-            ({"k": 1, 2: 3, "a": 33}, Mapping[Union[str], int]),
             ((1, "b", 3.0), Tuple[int, str, float, str]),
-            ({1, 2, 3}, Set[float]),
-            (f_mul_int_typed, Callable[[int, int], int])
+            (f_mul_int_typed, Callable[[int, int], int]),
         ]
 
         for i, arg in enumerate(args):
             with self.subTest(i=i):
-                got = check_obj_typing(arg[1], arg[0])
+                got = check_obj_typing(arg[0], arg[1])
                 self.assertFalse(got)
