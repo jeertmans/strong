@@ -20,10 +20,12 @@ from typing import (
     get_origin,
     get_args,
 )
+from collections import abc
+
 from strong.utils.output import DEFAULT_OUTPUT, raise_assertion_error
 
 
-def annotation_to_type(annotation: type):
+def annotation_to_type(annotation: type) -> type:
     if annotation == inspect.Parameter.empty:
         return Any
     else:
@@ -120,7 +122,7 @@ def tag(*tags: type) -> Callable:
 
     def _tag_(func):
         assert (
-                get_type_hints(func) == _TAG_FUNCTION_SIGNATURE_
+            get_type_hints(func) == _TAG_FUNCTION_SIGNATURE_
         ), f"Function {func} must exactly have this signature: {_TAG_FUNCTION_SIGNATURE_}"
         for _tag in tags:
             _TAGS_[_tag] = func
@@ -130,23 +132,32 @@ def tag(*tags: type) -> Callable:
     return _tag_
 
 
+def _issubclass_(a: type, b: type) -> bool:
+    if a is Any:
+        return a
+    elif b is Any:
+        return False
+    else:
+        return issubclass(a, b)
+
+
 @tag(Any)
 def _any_(x: Any, *args: type) -> bool:
     return True
 
 
-@tag(Callable)
+@tag(Callable, abc.Callable)
 def _callable_(x: Any, *args: type) -> bool:
     if not isinstance(x, Callable):
         return False
     if args:
-        args, ret = get_function_type_hints(x)
         arg_tps = args[0]
         ret_tp = args[1]
+        args, ret = get_function_type_hints(x)
         return (
-                len(args) == len(arg_tps)
-                and all(issubclass(arg_tp, arg) for arg, arg_tp in zip(args, arg_tps))
-                and issubclass(ret_tp, ret)
+            len(args) == len(arg_tps)
+            and all(_issubclass_(arg_tp, arg) for arg, arg_tp in zip(args, arg_tps))
+            and _issubclass_(ret_tp, ret)
         )
     return True
 
@@ -158,7 +169,6 @@ def _tuple_(x: Any, *args: type) -> bool:
 
 @tag(Type, type)
 def _type_(x: Any, *args: type) -> bool:
-    print("In here")
     return check_obj_typing(x, args[0])
 
 

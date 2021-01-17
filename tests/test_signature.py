@@ -63,6 +63,7 @@ class TestDecorators(TestCase):
             ((1, "b", 3.0), Tuple[int, str, float]),
             ({1, 2, 3}, Set[int]),
             (f_mul_int_typed, Callable[[int, int], float]),
+            (f_mul_int_typed, Callable[[int, Any], Any]),
             (1, Type[int]),
         ]
 
@@ -82,6 +83,8 @@ class TestDecorators(TestCase):
             ([4, 5], Set[int]),
             ((1, "b", 3.0), Tuple[int, str, float, str]),
             (f_mul_int_typed, Callable[[int, int], int]),
+            (f_mul_int_missing_all, Callable[[int, int], int]),
+            (f_mul_int_missing_all, Callable[[int, Any], int]),
         ]
 
         for i, arg in enumerate(args):
