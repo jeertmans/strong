@@ -20,3 +20,5 @@ strong.egg-info/
 tests/__pycache__/
 
 *.pyc
+
+.eggs/

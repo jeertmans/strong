@@ -31,7 +31,7 @@ To install **Strong**, simply using pip:
 
    This package mostly relies on the quite recent **inspect** and **typing**
    package features. This package therefore require a Python installation
-   with version >= 3.5.
+   with version >= 3.8.
 
 Read the documentation
 ----------------------
